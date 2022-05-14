@@ -110,5 +110,7 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, rz){
 
     //Verificador das dimensões
-    int xo = (xcenter - rx < 0) ? 0:
+    int xo = (xcenter - rx < 0) ? 0: xcenter - rx;
+    int x1 = (xcenter + rx > this -> nx) ? this -> nx : xcenter + rx;
+    int y0
 }
