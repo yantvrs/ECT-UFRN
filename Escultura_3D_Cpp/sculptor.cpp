@@ -190,7 +190,7 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
          for(int j=y0;j<y1;j++){
            //Fórmula do elipsóide com preenchimento interno
            elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
-           //Condições para o preenchimento das elipses
+           //Condições para a remoção das elipses
            if(elips < 1){
              cutVoxel(i,j,k); //Para construir o elipsóide
            }
@@ -239,9 +239,5 @@ void Sculptor::writeOFF(char *filename){
         }
     }
 
-    //Definição das propriedades em cada face
-    int contVOn = 0;
-    for(i=0;i<nx;i++){
-        for(j=0)
-    }
+
 }
