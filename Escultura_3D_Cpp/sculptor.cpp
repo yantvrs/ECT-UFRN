@@ -1,85 +1,99 @@
-#include "sculptor.hpp"
+//Headers
 #include <iostream>
 #include <stdlib.h>
-#include <cmath>
 #include <vector>
 #include <fstream>
+#include "sculptor.hpp"
+#include <cmath>
 
 using namespace std;
 
 //Função construtora
 Sculptor::Sculptor(int _nx, int _ny, int _nz){
 
-    this -> nx = _nx;
-    this -> ny = _ny;
-    this -> nz = _nz;
+    //Dimensões
+    nx = _nx;
+    ny = _ny;
+    nz = _nz;
 
-    this -> r = 0;
-    this -> g = 0;
-    this -> b = 0;
-    this -> a = 0;
+    //Inicializando cores(Obs:valores de 0 a 1)
+    r = 0;
+    g = 0;
+    b = 0;
+    a = 0;
 
-    //Reservando memória
-    vox = new Voxel**[_nx];
+    //Alocando memória
+    v = new Voxel**[_nx];
+
     for(int i = 0; i < _nx; i++){
-        vox[i] = new Voxel*[_ny];
+        v[i] = new Voxel*[_ny];
+    }
+
+    for(int i = 0; i < _nx; i++){
+        for(int j= 0; j < _ny; j++){
+            v[i][j] = new Voxel[_nz];
+        }
+    }
+
+
+    for(int i = 0; i < _nx; i++){
         for(int j = 0; j < _ny; j++){
-            vox[i][j] = new Voxel[_nz];
-            for(int k = 0; k < -nz; k++){
-                this -> vox[i][j][k].r = 0;
-                this -> vox[i][j][k].g = 0;
-                this -> vox[i][j][k].b = 0;
-                this -> vox[i][j][k].a = 0;
-                this -> vox[i][j][k].isOn = false;
+            for(int k = 0; k < _nz; k++){
+
+                v[i][j][k].isOn = false;
+                v[i][j][k].r = r;
+                v[i][j][k].g = g;
+                v[i][j][k].b = b;
+                v[i][j][k].a = g;
+
             }
         }
     }
+
 }
 
 //Função destrutora
 Sculptor::~Sculptor(){
     for(int i = 0; i < nx; i++){
         for( int j = 0; j < ny; j++){
-            delete[]vox[i][j];
+            delete[] v[i][j];
         }
-        delete[]vox [i];
+        delete[] v[i];
     }
-    delete[]vox;
+    delete[] v ;
+    nx = ny = nz = 0;
 }
 
 //Cores
-void Sculptor::setColor(float r, float g, float b, float alpha){
-    this -> r = r;
-    this -> g = g;
-    this -> b = b;
-    this -> a = alpha;
+void Sculptor::setColor(float color_r, float color_g, float color_b, float alpha){
+    r = color_r;
+    g = color_g;
+    b = color_b;
+    a = alpha;
 }
 
 //Put voxel
 void Sculptor::putVoxel(int x, int y, int z){
-    this -> vox[x][y][z].r = this -> r;
-    this -> vox[x][y][z].g = this -> g;
-    this -> vox[x][y][z].b = this -> b;
-    this -> vox[x][y][z].a = this -> a;
-    this -> vox[x][y][z].isOn = true;
+    v[x][y][z].r = r;
+    v[x][y][z].g = g;
+    v[x][y][z].b = b;
+    v[x][y][z].a = a;
+    v[x][y][z].isOn = true;
+}
+
+//cut Voxel
+void Sculptor::cutVoxel(int x, int y, int z){
+    v[x][y][z].isOn = false;
 }
 
 //Adicionando paralelepípedo
 void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
-    //Verificador das dimensões
-    x0 = ( x0 < 0 ) ? 0:x0;
-    x1 = ( x1 > this->nx ) ? this -> nx:x1;
-    y0 = ( y0 < 0 ) ? 0:y0;
-    y1 = ( y1 > this->ny ) ? this -> ny:y1;
-    z0 = ( z0 < 0 ) ? 0:z0;
-    z1 = ( z1 > this->nz ) ? this -> nz:z1;
-
     //Atribuição dos intervalos nos voxels
     for( int i = x0; i < x1; i++){
         for( int j = y0; j < y1; j++){
             for( int k = z0; k < z1; k++){
-                this -> putVoxel(i,j,k);
+                putVoxel(i,j,k);
             }
         }
     }
@@ -90,7 +104,7 @@ void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
     for(int i = x0; i < x1; i++){
         for(int j = y0; j < y1; j++){
             for(int k = z0; k < z1 ; k++){
-                this -> cutVoxel(i,j,k);
+                cutVoxel(i,j,k);
             }
         }
     }
@@ -98,19 +112,136 @@ void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
 //Adicionando esfera
 void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
-    putEllipsoid(xcenter, ycenter, zcenter, radius, radius, radius);
+
+   float sphere;
+
+   for(int i = 0; i < nx ; i++ ){
+       for(int  j = 0; j < ny ; j++ ){
+           for(int k = 0; k < nx ; k++ ){
+           sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+           if(sphere < pow(radius,2)){
+               putVoxel(i,j,k);
+           }
+           }
+       }
+   }
 }
 
 //Removendo esfere
 void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
-    cutEllipsoid(xcenter, ycenter, zcenter, radius, radius, radius);
+
+    float sphere;
+
+    for(int i = 0; i < nx ; i++ ){
+        for(int  j = 0; j < ny ; j++ ){
+            for(int k = 0; k < nx ; k++ ){
+            sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+            if(sphere< pow(radius,2)){
+                cutVoxel(i,j,k);
+            }
+            }
+        }
+    }
 }
 
 //Adicionando elipsóide
-void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, rz){
+void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry,int rz){
+
+    float elips;
 
     //Verificador das dimensões
-    int xo = (xcenter - rx < 0) ? 0: xcenter - rx;
-    int x1 = (xcenter + rx > this -> nx) ? this -> nx : xcenter + rx;
-    int y0
+    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
+    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
+    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
+    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
+    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
+    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
+
+    for(int k=z0;k<z1;k++){
+       for(int i=x0;i<x1;i++){
+         for(int j=y0;j<y1;j++){
+           //Fórmula do elipsóide com preenchimento interno
+           elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
+           //Condições para o preenchimento das elipses
+           if(elips < 1){
+             putVoxel(i,j,k); //Para construir o elipsóide
+           }
+         }
+       }
+     }
+}
+
+//Removendo eipsóide
+
+void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry,int rz){
+
+    float elips;
+
+    //Verificador das dimensões
+    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
+    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
+    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
+    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
+    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
+    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
+
+    for(int k=z0;k<z1;k++){
+       for(int i=x0;i<x1;i++){
+         for(int j=y0;j<y1;j++){
+           //Fórmula do elipsóide com preenchimento interno
+           elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
+           //Condições para o preenchimento das elipses
+           if(elips < 1){
+             cutVoxel(i,j,k); //Para construir o elipsóide
+           }
+         }
+       }
+     }
+}
+
+//Gera um arquivo OFF
+void Sculptor::writeOFF(char *filename){
+
+    ofstream myFile(filename);
+
+    if(!myFile.is_open()){
+        cout << "Error while open file: " << filename << endl;
+        exit(1);
+    }
+    //Conta os voxels
+    int vOn = 0, i, j, k;
+    for(i = 0;i < nx; i++){
+        for(j = 0; j < ny; j++){
+            for(k = 0; k < nz; k++){
+                vOn++;
+            }
+        }
+    }
+
+    //Escrevendo arquivo em off
+    myFile << "OFF" << endl;
+    myFile << 8*vOn << " " << 6*vOn << " 0" << endl;
+
+    for(i=0;i<nx;i++){
+        for( j=0;j<ny;j++){
+            for(k=0;k<nz;k++){
+                if(v[i][j][k].isOn){
+                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
+                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
+                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
+                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
+                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
+                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
+                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
+                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
+                }
+            }
+        }
+    }
+
+    //Definição das propriedades em cada face
+    int contVOn = 0;
+    for(i=0;i<nx;i++){
+        for(j=0)
+    }
 }
