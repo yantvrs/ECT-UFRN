@@ -118,10 +118,10 @@ void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
    for(int i = 0; i < nx ; i++ ){
        for(int  j = 0; j < ny ; j++ ){
            for(int k = 0; k < nx ; k++ ){
-           sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
-           if(sphere < pow(radius,2)){
-               putVoxel(i,j,k);
-           }
+               sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+               if(sphere < pow(radius,2)){
+                   putVoxel(i,j,k);
+               }
            }
        }
    }
@@ -135,10 +135,10 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
     for(int i = 0; i < nx ; i++ ){
         for(int  j = 0; j < ny ; j++ ){
             for(int k = 0; k < nx ; k++ ){
-            sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
-            if(sphere< pow(radius,2)){
-                cutVoxel(i,j,k);
-            }
+                sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+                if(sphere< pow(radius,2)){
+                    cutVoxel(i,j,k);
+                }
             }
         }
     }
@@ -149,21 +149,13 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
     float elips;
 
-    //Verificador das dimensões
-    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
-    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
-    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
-    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
-    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
-    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
-
-    for(int k=z0;k<z1;k++){
-       for(int i=x0;i<x1;i++){
-         for(int j=y0;j<y1;j++){
+    for(int k=0;k<nz;k++){
+       for(int i=0;i<nx;i++){
+         for(int j=0;j<ny;j++){
            //Fórmula do elipsóide com preenchimento interno
            elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
            //Condições para o preenchimento das elipses
-           if(elips < 1){
+           if(elips <= 1){
              putVoxel(i,j,k); //Para construir o elipsóide
            }
          }
@@ -177,21 +169,13 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
     float elips;
 
-    //Verificador das dimensões
-    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
-    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
-    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
-    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
-    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
-    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
-
-    for(int k=z0;k<z1;k++){
-       for(int i=x0;i<x1;i++){
-         for(int j=y0;j<y1;j++){
+    for(int k=0;k<nz;k++){
+       for(int i=0;i<nx;i++){
+         for(int j=0;j<ny;j++){
            //Fórmula do elipsóide com preenchimento interno
            elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
-           //Condições para a remoção das elipses
-           if(elips < 1){
+           //Condições para o preenchimento das elipses
+           if(elips <= 1){
              cutVoxel(i,j,k); //Para construir o elipsóide
            }
          }
@@ -200,7 +184,64 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 }
 
 //Gera um arquivo OFF
-void Sculptor::writeOFF(char *filename){
+void Sculptor::writeOFF(char *file_name_sculptor){
+    int vertex, face, edge = 0; //Vértices e faces
+    int on_voxel;
+
+    on_voxel=0;
+
+    ofstream fout(file_name_sculptor);
+    fout.open(file_name_sculptor); //Abertura do arquivo
+
+    if(!fout.is_open()){
+        cout << "Falha na criação do arquivo" << "\n" << endl;
+        exit(1);
+    }
+
+    //Contador de voxels ativos
+
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+                    on_voxel++;
+                }
+            }
+        }
+    }
+
+
+
+    vertex = on_voxel*8; //Quantidade de vértices da figura
+
+    face = on_voxel*6; //Quantidade de faces da figura
+
+
+    //Para fazer a identificação
+    fout << "OFF" << endl;
+
+    //Número de faces, vértices e arestas
+    fout << vertex << " " << face << " " << edge << endl;
+
+    //Coordenadas espaciais
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+                    fout << i - 0.5 << " " << j + 0.5 << " " << k - 0.5 << endl;
+                    fout << i - 0.5 << " " << j - 0.5 << " " << k - 0.5 << endl;
+                    fout << i + 0.5 << " " << j - 0.5 << " " << k - 0.5 << endl;
+                    fout << i + 0.5 << " " << j + 0.5 << " " << k - 0.5 << endl;
+                    fout << i - 0.5 << " " << j + 0.5 << " " << k + 0.5 << endl;
+                    fout << i - 0.5 << " " << j - 0.5 << " " << k + 0.5 << endl;
+                    fout << i + 0.5 << " " << j - 0.5 << " " << k + 0.5 << endl;
+                    fout << i + 0.5 << " " << j + 0.5 << " " << k + 0.5 << endl;
+                }
+            }
+        }
+    }
+
+    //Faces
 
 
 }
