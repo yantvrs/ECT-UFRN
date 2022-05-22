@@ -202,42 +202,5 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 //Gera um arquivo OFF
 void Sculptor::writeOFF(char *filename){
 
-    ofstream myFile(filename);
-
-    if(!myFile.is_open()){
-        cout << "Error while open file: " << filename << endl;
-        exit(1);
-    }
-    //Conta os voxels
-    int vOn = 0, i, j, k;
-    for(i = 0;i < nx; i++){
-        for(j = 0; j < ny; j++){
-            for(k = 0; k < nz; k++){
-                vOn++;
-            }
-        }
-    }
-
-    //Escrevendo arquivo em off
-    myFile << "OFF" << endl;
-    myFile << 8*vOn << " " << 6*vOn << " 0" << endl;
-
-    for(i=0;i<nx;i++){
-        for( j=0;j<ny;j++){
-            for(k=0;k<nz;k++){
-                if(v[i][j][k].isOn){
-                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
-                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
-                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
-                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
-                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
-                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
-                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
-                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
-                }
-            }
-        }
-    }
-
 
 }
