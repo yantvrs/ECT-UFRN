@@ -191,6 +191,7 @@ void Sculptor::writeOFF(char *file_name_sculptor){
     on_voxel=0;
 
     ofstream fout(file_name_sculptor);
+
     fout.open(file_name_sculptor); //Abertura do arquivo
 
     if(!fout.is_open()){
