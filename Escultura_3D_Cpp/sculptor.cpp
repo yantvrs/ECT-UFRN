@@ -192,6 +192,9 @@ void Sculptor::writeOFF(char *file_name_sculptor){
 
     ofstream fout(file_name_sculptor);
 
+    int p = 0;
+    int cont = 0;
+
     fout.open(file_name_sculptor); //Abertura do arquivo
 
     if(!fout.is_open()){
@@ -244,5 +247,25 @@ void Sculptor::writeOFF(char *file_name_sculptor){
 
     //Faces
 
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+
+                    p = 8 * cont;
+
+                    fout << 4 << " " << p + 0 << " " << p + 3 << " " << p + 2 << " " << p + 1 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 4 << " " << p + 5 << " " << p + 6 << " " << p + 7 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 0 << " " << p + 1 << " " << p + 5 << " " << p + 4 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 0 << " " << p + 4 << " " << p + 7 << " " << p + 3 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 3 << " " << p + 7 << " " << p + 6 << " " << p + 2 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 1 << " " << p + 2 << " " << p + 6 << " " << p + 5 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    cont ++;
+                }
+            }
+        }
+    }
+
+fout.close(); //Arquivo fechado
 
 }
