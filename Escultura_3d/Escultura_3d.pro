@@ -8,5 +8,5 @@ SOURCES += \
         sculptor.cpp
 
 HEADERS += \
-    sculptor.h \
-    voxel.h
+    sculptor.hpp \
+    voxel.hpp

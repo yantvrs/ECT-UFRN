@@ -7,4 +7,4 @@ struct Voxel{
     bool isOn; //True or false(inclusão ou não do voxel)
 };
 
-#endif // VOXEL_HP
+#endif // VOXEL_HPP

@@ -1,4 +1,5 @@
 //Headers
+#include <iomanip>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
@@ -101,6 +102,8 @@ void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
 //Removendo paralelepípedo
 void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
+
+
     for(int i = x0; i < x1; i++){
         for(int j = y0; j < y1; j++){
             for(int k = z0; k < z1 ; k++){
@@ -118,16 +121,16 @@ void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
    for(int i = 0; i < nx ; i++ ){
        for(int  j = 0; j < ny ; j++ ){
            for(int k = 0; k < nx ; k++ ){
-           sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
-           if(sphere < pow(radius,2)){
-               putVoxel(i,j,k);
-           }
+               sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+               if(sphere < pow(radius,2)){
+                   putVoxel(i,j,k);
+               }
            }
        }
    }
 }
 
-//Removendo esfere
+//Removendo esfera
 void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 
     float sphere;
@@ -135,10 +138,10 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
     for(int i = 0; i < nx ; i++ ){
         for(int  j = 0; j < ny ; j++ ){
             for(int k = 0; k < nx ; k++ ){
-            sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
-            if(sphere< pow(radius,2)){
-                cutVoxel(i,j,k);
-            }
+                sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
+                if(sphere < pow(radius,2)){
+                    cutVoxel(i,j,k);
+                }
             }
         }
     }
@@ -149,21 +152,13 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
     float elips;
 
-    //Verificador das dimensões
-    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
-    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
-    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
-    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
-    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
-    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
-
-    for(int k=z0;k<z1;k++){
-       for(int i=x0;i<x1;i++){
-         for(int j=y0;j<y1;j++){
+    for(int k=0;k<nz;k++){
+       for(int i=0;i<nx;i++){
+         for(int j=0;j<ny;j++){
            //Fórmula do elipsóide com preenchimento interno
            elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
            //Condições para o preenchimento das elipses
-           if(elips < 1){
+           if(elips <= 1){
              putVoxel(i,j,k); //Para construir o elipsóide
            }
          }
@@ -177,21 +172,13 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 
     float elips;
 
-    //Verificador das dimensões
-    int x0 = (xcenter - rx < 0) ? 0: xcenter - rx;
-    int x1 = (xcenter + rx > nx) ? nx : xcenter+rx;
-    int y0 = (ycenter - ry < 0) ? 0: ycenter - rx;
-    int y1 = (ycenter + ry > ny) ? ny : ycenter+ry;
-    int z0 = (zcenter - rz < 0) ? 0: zcenter - rz;
-    int z1 = (zcenter + rz > nz) ? nz : zcenter+rz;
-
-    for(int k=z0;k<z1;k++){
-       for(int i=x0;i<x1;i++){
-         for(int j=y0;j<y1;j++){
+    for(int k=0;k<nz;k++){
+       for(int i=0;i<nx;i++){
+         for(int j=0;j<ny;j++){
            //Fórmula do elipsóide com preenchimento interno
            elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
-           //Condições para a remoção das elipses
-           if(elips < 1){
+           //Condições para o preenchimento das elipses
+           if(elips <= 1){
              cutVoxel(i,j,k); //Para construir o elipsóide
            }
          }
@@ -200,44 +187,87 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 }
 
 //Gera um arquivo OFF
-void Sculptor::writeOFF(char *filename){
+void Sculptor::writeOFF(char *file_name_sculptor){
+    int vertex, face, edge = 0; //Vértices e faces
+    int on_voxel;
 
-    ofstream myFile(filename);
+    on_voxel=0;
 
-    if(!myFile.is_open()){
-        cout << "Error while open file: " << filename << endl;
+    ofstream fout;//Pesquisar no cpp ofestream
+
+    int p = 0;
+    int cont = 0;
+
+    fout.open(file_name_sculptor); //Abertura do arquivo
+
+    if(!fout.is_open()){
+        cout << "Falha na criação do arquivo" << "\n" << endl;
         exit(1);
     }
-    //Conta os voxels
-    int vOn = 0, i, j, k;
-    for(i = 0;i < nx; i++){
-        for(j = 0; j < ny; j++){
-            for(k = 0; k < nz; k++){
-                vOn++;
-            }
-        }
-    }
 
-    //Escrevendo arquivo em off
-    myFile << "OFF" << endl;
-    myFile << 8*vOn << " " << 6*vOn << " 0" << endl;
+    //Contador de voxels ativos
 
-    for(i=0;i<nx;i++){
-        for( j=0;j<ny;j++){
-            for(k=0;k<nz;k++){
-                if(v[i][j][k].isOn){
-                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
-                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
-                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k-0.5<<endl;
-                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k-0.5<<endl;
-                    myFile<<i-0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
-                    myFile<<i-0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
-                    myFile<<i+0.5<<" "<<j-0.5<<" "<<k+0.5<<endl;
-                    myFile<<i+0.5<<" "<<j+0.5<<" "<<k+0.5<<endl;
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+                    on_voxel++;
                 }
             }
         }
     }
 
 
+
+    vertex = on_voxel*8; //Quantidade de vértices da figura
+
+    face = on_voxel*6; //Quantidade de faces da figura
+
+
+    //Para fazer a identificação
+    fout << "OFF" << endl;
+
+    //Número de faces, vértices e arestas
+    fout << vertex << " " << face << " " << edge << endl;
+
+    //Coordenadas espaciais
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+                    fout << i - 0.5 << " " << j + 0.5 << " " << k - 0.5 << endl;
+                    fout << i - 0.5 << " " << j - 0.5 << " " << k - 0.5 << endl;
+                    fout << i + 0.5 << " " << j - 0.5 << " " << k - 0.5 << endl;
+                    fout << i + 0.5 << " " << j + 0.5 << " " << k - 0.5 << endl;
+                    fout << i - 0.5 << " " << j + 0.5 << " " << k + 0.5 << endl;
+                    fout << i - 0.5 << " " << j - 0.5 << " " << k + 0.5 << endl;
+                    fout << i + 0.5 << " " << j - 0.5 << " " << k + 0.5 << endl;
+                    fout << i + 0.5 << " " << j + 0.5 << " " << k + 0.5 << endl;
+                }
+            }
+        }
+    }
+
+    //Faces
+
+    for(int k = 0; k < nz; k++){
+        for(int i = 0; i < nx; i++ ){
+            for(int j = 0; j < ny; j++){
+                if(v[i][j][k].isOn == true){
+                    p = 8 * cont;
+                    fout << 4 << " " << p + 0 << " " << p + 3 << " " << p + 2 << " " << p + 1 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 4 << " " << p + 5 << " " << p + 6 << " " << p + 7 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 0 << " " << p + 1 << " " << p + 5 << " " << p + 4 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 0 << " " << p + 4 << " " << p + 7 << " " << p + 3 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 3 << " " << p + 7 << " " << p + 6 << " " << p + 2 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    fout << 4 << " " << p + 1 << " " << p + 2 << " " << p + 6 << " " << p + 5 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
+                    cont ++;
+                }
+            }
+        }
+    }
+
+fout.close(); //Arquivo fechado
+
 }
+

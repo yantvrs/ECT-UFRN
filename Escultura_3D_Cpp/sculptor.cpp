@@ -1,4 +1,5 @@
 //Headers
+#include <iomanip>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
@@ -101,6 +102,8 @@ void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
 //Removendo paralelepípedo
 void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
+
+
     for(int i = x0; i < x1; i++){
         for(int j = y0; j < y1; j++){
             for(int k = z0; k < z1 ; k++){
@@ -112,6 +115,10 @@ void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
 
 //Adicionando esfera
 void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
+
+    xcenter = (x0<0) ? 0 : x0;
+    y0 = (y0<0) ? 0 : y0;
+    z0 = (z0<0) ? 0 : z0;
 
    float sphere;
 
@@ -127,7 +134,7 @@ void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
    }
 }
 
-//Removendo esfere
+//Removendo esfera
 void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 
     float sphere;
@@ -136,7 +143,7 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
         for(int  j = 0; j < ny ; j++ ){
             for(int k = 0; k < nx ; k++ ){
                 sphere = ((i-xcenter)*(i-xcenter))+((j-ycenter)*(j-ycenter))+((k-zcenter)*(k-zcenter));
-                if(sphere< pow(radius,2)){
+                if(sphere < pow(radius,2)){
                     cutVoxel(i,j,k);
                 }
             }
@@ -190,7 +197,7 @@ void Sculptor::writeOFF(char *file_name_sculptor){
 
     on_voxel=0;
 
-    ofstream fout(file_name_sculptor);
+    ofstream fout();//Pesquisar no cpp ofestream
 
     int p = 0;
     int cont = 0;
@@ -246,14 +253,13 @@ void Sculptor::writeOFF(char *file_name_sculptor){
     }
 
     //Faces
-
+fout.setprecision(2);
+  fout<<fixed;
     for(int k = 0; k < nz; k++){
         for(int i = 0; i < nx; i++ ){
             for(int j = 0; j < ny; j++){
                 if(v[i][j][k].isOn == true){
-
                     p = 8 * cont;
-
                     fout << 4 << " " << p + 0 << " " << p + 3 << " " << p + 2 << " " << p + 1 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
                     fout << 4 << " " << p + 4 << " " << p + 5 << " " << p + 6 << " " << p + 7 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
                     fout << 4 << " " << p + 0 << " " << p + 1 << " " << p + 5 << " " << p + 4 << " " << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << endl;
