@@ -75,11 +75,13 @@ void Sculptor::setColor(float color_r, float color_g, float color_b, float alpha
 
 //Put voxel
 void Sculptor::putVoxel(int x, int y, int z){
+  if(x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz){
     v[x][y][z].r = r;
     v[x][y][z].g = g;
     v[x][y][z].b = b;
     v[x][y][z].a = a;
     v[x][y][z].isOn = true;
+    }
 }
 
 //cut Voxel
@@ -148,42 +150,33 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 }
 
 //Adicionando elipsóide
-void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry,int rz){
-
-    float elips;
-
-    for(int k=0;k<nz;k++){
-       for(int i=0;i<nx;i++){
-         for(int j=0;j<ny;j++){
-           //Fórmula do elipsóide com preenchimento interno
-           elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
-           //Condições para o preenchimento das elipses
-           if(elips <= 1){
-             putVoxel(i,j,k); //Para construir o elipsóide
-           }
-         }
-       }
-     }
+void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
+    float elipsoid;
+    for(int i = xcenter - rx; i < xcenter + rx; i++){
+        for(int j = ycenter - ry; j < ycenter + ry; j++){
+            for(int k = zcenter - rz; k < zcenter + rz; k++){
+                elipsoid = pow(i - xcenter, 2)/pow(rx,2) + pow(j - ycenter, 2)/pow(ry,2) + pow(k - zcenter,2)/pow(rz,2);
+                if(elipsoid < 1){
+                    putVoxel(i,j,k);
+                }
+            }
+        }
+    }
 }
 
-//Removendo eipsóide
-
-void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry,int rz){
-
-    float elips;
-
-    for(int k=0;k<nz;k++){
-       for(int i=0;i<nx;i++){
-         for(int j=0;j<ny;j++){
-           //Fórmula do elipsóide com preenchimento interno
-           elips = (((i-xcenter)/rx)*((i-xcenter)/rx))+(((j-ycenter)/ry)*((j-ycenter)/ry))+(((k-zcenter)/rz)*((k-zcenter)/rz));
-           //Condições para o preenchimento das elipses
-           if(elips <= 1){
-             cutVoxel(i,j,k); //Para construir o elipsóide
-           }
-         }
-       }
-     }
+//Removendo elipsóide
+void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
+    float elipsoid;
+    for(int i = xcenter - rx; i < xcenter + rx; i++){
+        for(int j = ycenter - ry; j < ycenter + ry; j++){
+            for(int k = zcenter - rz; k < zcenter + rz; k++){
+                elipsoid = pow(i - xcenter, 2)/pow(rx,2) + pow(j - ycenter, 2)/pow(ry,2) + pow(k - zcenter,2)/pow(rz,2);
+                if(elipsoid < 1){
+                    cutVoxel(i,j,k);
+                }
+            }
+        }
+    }
 }
 
 //Gera um arquivo OFF
@@ -270,4 +263,3 @@ void Sculptor::writeOFF(char *file_name_sculptor){
 fout.close(); //Arquivo fechado
 
 }
-

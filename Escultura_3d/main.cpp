@@ -153,6 +153,29 @@ int main(){
   ect.putBox(27,32,4,5,18,22);
   ect.putBox(27,32,8,9,18,22);
   ect.putBox(27,32,12,13,18,22);
+  ect.putBox(27,32,18,19,18,22);
+
+  //Varanda união
+  ect.setColor(238, 238, 224, 238);
+  ect.putBox(27,31,5,6,18,19);
+  ect.putBox(27,31,5,6,21,22);
+
+  ect.putBox(27,31,9,10,18,19);
+  ect.putBox(27,31,9,10,21,22);
+
+  ect.putBox(27,31,13,14,18,19);
+  ect.putBox(27,31,13,14,21,22);
+
+  //Varanda frontal
+  ect.putBox(41,58,5,6,21,22);
+  ect.putBox(41,58,9,10,21,22);
+  ect.putBox(41,58,13,14,21,22);
+
+
+  //Varanda externa
+  ect.putBox(7,20,5,6,18,19);
+  ect.putBox(7,20,9,10,18,19);
+  ect.putBox(7,20,13,14,18,19);
 
   //Grama baixo frente
 
@@ -193,17 +216,17 @@ int main(){
   ect.putBox(69,70,1,2,27,35);
 
   ect.putBox(15,16,1,2,37,43);
-  ect.putBox(15,28,1,2,37,38);
+  //ect.putBox(15,28,1,2,37,38);
   ect.putBox(15,28,1,2,42,43);
   ect.putBox(27,28,1,2,37,43);
 
   ect.putBox(30,31,1,2,37,43);
-  ect.putBox(30,53,1,2,37,38);
+  //ect.putBox(30,53,1,2,37,38);
   ect.putBox(30,53,1,2,42,43);
   ect.putBox(52,53,1,2,37,43);
 
   ect.putBox(55,56,1,2,37,43);
-  ect.putBox(55,70,1,2,37,38);
+  //ect.putBox(55,70,1,2,37,38);
   ect.putBox(55,70,1,2,42,43);
   ect.putBox(69,70,1,2,37,43);
 
@@ -309,15 +332,19 @@ int main(){
   ect.putBox(50,53,14,16,5,6);
   ect.putBox(54,57,14,16,5,6);
 
+  //Teto direito
+  ect.setColor(130, 130, 130, 10);
+  ect.putBox(27,64,19,20,3,33);
+  ect.cutBox(27,30,19,20,1,13);
+  ect.cutBox(3,61,19,20,19,21);
+  ect.cutBox(20,27,19,20,18,19);
+  ect.cutBox(57,61,19,20,19,24);
 
-  //Efeito chuva
-  ect.setColor(135, 206, 235,1.0);
-  for(int i = 0; i < 200; i++){
-      int x = rand() % 80;
-      int y = rand() % 60;
-      int z = rand() % 50;
-      ect.putVoxel(x,y,z);
-  }
+  //Teto esquerdo
+  ect.putBox(3,27,19,20,13,35);
+  ect.cutBox(3,61,19,20,19,21);
+  ect.cutBox(20,27,19,20,18,19);
+  ect.cutBox(3,7,19,20,16,120);
 
 
   ect.writeOFF((char*)"ect.off");
