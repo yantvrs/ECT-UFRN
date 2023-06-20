@@ -68,29 +68,9 @@ Este projeto consiste na criação de uma escultura digital da Escola de Ciênci
 
 6. Abra o arquivo gerado com o GeomView ou um software de visualização compatível para visualizar a escultura.
 
-🤝 **Contribuição**
-
-Contribuições para o projeto são bem-vindas! Siga estes passos para contribuir:
-
-1. Faça um fork do repositório.
-
-2. Crie um novo branch para sua funcionalidade:
-
-   ```
-   git checkout -b feature/nome-da-sua-funcionalidade
-   ```
-
-3. Faça as alterações necessárias e faça commit delas.
-
-4. Envie suas alterações para o seu repositório forkado.
-
-5. Envie um pull request para o repositório principal.
-
 👏 **Créditos**
 
-- Desenvolvido por [Yan Tavares](https://github.com/yantvrs) e [Eman
-
-oel Batista](https://github.com/EmanoelBatista).
+- Desenvolvido por [Yan Tavares](https://github.com/yantvrs) e [Emanoel Batista](https://github.com/EmanoelBatista).
 - Orientação do projeto pelo Professor [Agostinho Brito](https://github.com/agostinhobritojr).
 - Departamento de Engenharia da Computação e Automação, Universidade Federal do Rio Grande do Norte.
 
