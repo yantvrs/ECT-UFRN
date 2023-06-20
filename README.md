@@ -1,4 +1,4 @@
-🏛️ **Escultura da Escola de Ciências e Tecnologia - ECT/UFRN**
+## 🏛️ Escultura da Escola de Ciências e Tecnologia - ECT/UFRN
 
 Projeto desenvolvido para a disciplina de Programação Avançada (dca1202) na UFRN.
 
